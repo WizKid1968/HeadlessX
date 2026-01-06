@@ -7,20 +7,20 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy package files first (for Docker layer caching)
+# Copy package files
 COPY package*.json ./
 
-# Install Node.js dependencies
-RUN npm ci --only=production
+# Install ALL dependencies (including dev)
+RUN npm ci
 
 # Install Playwright browser and dependencies
 RUN npx playwright install chromium && \
     npx playwright install-deps chromium
 
-# Copy application code
+# Copy rest of app
 COPY . .
 
-# Build the website
+# Build website
 RUN cd website && npm ci && npm run build && cd ..
 
 EXPOSE 10000
